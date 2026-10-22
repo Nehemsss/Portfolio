@@ -1,0 +1,2580 @@
+/* Light/dark tokens follow the day/night setting via <html data-theme>. --accent comes from the season theme. */
+:root {
+  --accent: #0ea5e9;
+  --accent-contrast: #ffffff;
+  --bg: #f6f8fb;
+  --surface: #ffffff;
+  --text: #0f172a;
+  --text-muted: #475569;
+  --border: #dbe2ea;
+  --radius: 12px;
+  --font: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  /* Rounded, friendly display font for HUD, buttons and headings */
+  --font-display: 'Fredoka', var(--font);
+
+  /* Summer palette */
+  --sun: #ffd23f;
+  --sun-dark: #e0a800;
+  --sea: #2ec4d6;
+  --sea-dark: #1a8fa0;
+  --coral: #ff7a59;
+  --coral-dark: #d9533a;
+  --sand: #f7e2a8;
+  --sand-dark: #d9b66a;
+  --ink: #1d3557;
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  --bg: #0b1120;
+  --surface: #131c2e;
+  --text: #e2e8f0;
+  --text-muted: #94a3b8;
+  --border: #24314a;
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+}
+
+a {
+  color: var(--accent);
+}
+
+:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 3px;
+}
+
+/* Over the 3D scene the background can be anything (bright sand, night sea), so the HUD's focus
+   ring is white with a dark halo: visible on both. */
+.world-page :is(.hud-top, .minimap, .dock-prompt) :focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 6px var(--ink);
+}
+
+/* ---------- Chunky game-style buttons ----------
+   A solid "ledge" shadow under each button makes it look pressable; it squashes on :active. */
+.btn {
+  --btn-bg: #ffffff;
+  --btn-edge: #c9d6e2;
+  --btn-text: var(--ink);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  padding: 0.55em 1.05em;
+  border: 2px solid rgb(255 255 255 / 0.65);
+  border-radius: 16px;
+  background: var(--btn-bg);
+  box-shadow:
+    0 4px 0 var(--btn-edge),
+    0 8px 14px rgb(13 40 71 / 0.18);
+  color: var(--btn-text);
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease,
+    filter 0.12s ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.05);
+  box-shadow:
+    0 6px 0 var(--btn-edge),
+    0 12px 18px rgb(13 40 71 / 0.2);
+}
+
+.btn:active {
+  transform: translateY(3px);
+  box-shadow:
+    0 1px 0 var(--btn-edge),
+    0 3px 6px rgb(13 40 71 / 0.18);
+}
+
+.btn-icon {
+  font-size: 1.1em;
+  line-height: 1;
+}
+
+.btn-sun {
+  --btn-bg: var(--sun);
+  --btn-edge: var(--sun-dark);
+}
+
+/* Sea and coral are light, so they take dark ink text: white on them fails WCAG AA (~2.2–2.6:1). */
+.btn-sea {
+  --btn-bg: var(--sea);
+  --btn-edge: var(--sea-dark);
+  --btn-text: var(--ink);
+}
+
+.btn-coral {
+  --btn-bg: var(--coral);
+  --btn-edge: var(--coral-dark);
+  --btn-text: var(--ink);
+}
+
+.view-switcher {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+/* ---------- Loading screen ---------- */
+.loading-screen {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  padding: 16px;
+  background: linear-gradient(#4cc3f5 0%, #8fdcfb 55%, #c9f1ff 100%);
+  color: #fff;
+  font-family: var(--font-display);
+}
+
+.ls-sky {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.ls-cloud {
+  position: absolute;
+  width: 140px;
+  height: 44px;
+  border-radius: 999px;
+  background: #fff;
+  opacity: 0.92;
+  box-shadow: 0 6px 0 rgb(173 216 240 / 0.6);
+  animation: ls-drift linear infinite;
+}
+
+/* Two puffs on top of each cloud */
+.ls-cloud::before,
+.ls-cloud::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.ls-cloud::before {
+  width: 62px;
+  height: 62px;
+  top: -30px;
+  left: 22px;
+}
+
+.ls-cloud::after {
+  width: 46px;
+  height: 46px;
+  top: -20px;
+  left: 70px;
+}
+
+.ls-cloud-1 {
+  top: 14%;
+  animation-duration: 38s;
+  animation-delay: -6s;
+}
+
+.ls-cloud-2 {
+  top: 30%;
+  transform: scale(0.7);
+  animation-duration: 52s;
+  animation-delay: -30s;
+}
+
+.ls-cloud-3 {
+  top: 6%;
+  transform: scale(0.55);
+  animation-duration: 64s;
+  animation-delay: -45s;
+}
+
+.ls-gull {
+  position: absolute;
+  width: 34px;
+  fill: none;
+  stroke: #ffffff;
+  stroke-width: 3;
+  stroke-linecap: round;
+  animation: ls-glide 6s ease-in-out infinite;
+}
+
+.ls-gull-1 {
+  top: 22%;
+  left: 18%;
+}
+
+.ls-gull-2 {
+  top: 26%;
+  left: 24%;
+  width: 24px;
+  animation-delay: -2s;
+}
+
+.ls-content {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  justify-items: center;
+  gap: 0.9rem;
+  margin-bottom: 18vh; /* sit above the sea */
+  text-align: center;
+}
+
+.ls-title {
+  margin: 0;
+  font-size: clamp(2.2rem, 7vw, 3.6rem);
+  font-weight: 600;
+  line-height: 1.05;
+  color: #fff;
+  /* Cartoon outline keeps the white title readable when a cloud drifts behind it. */
+  -webkit-text-stroke: 7px var(--sea-dark);
+  paint-order: stroke fill;
+  text-shadow:
+    0 5px 0 var(--sea-dark),
+    0 10px 24px rgb(13 60 100 / 0.35);
+}
+
+.ls-subtitle {
+  margin: -0.4rem 0 0.4rem;
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+/* Progress bar: a sandy track with a candy-striped sunset fill. */
+.ls-bar {
+  width: min(340px, 80vw);
+  height: 22px;
+  padding: 4px;
+  border: 3px solid #fff;
+  border-radius: 999px;
+  background: var(--sand);
+  box-shadow:
+    0 4px 0 var(--sand-dark),
+    0 10px 18px rgb(13 40 71 / 0.18);
+  overflow: hidden;
+}
+
+.ls-bar-fill {
+  min-width: 14px; /* a nub stays visible at 0% so the bar reads as "started" */
+  height: 100%;
+  border-radius: 999px;
+  background:
+    repeating-linear-gradient(-45deg, rgb(255 255 255 / 0.35) 0 8px, transparent 8px 16px),
+    linear-gradient(90deg, var(--sun), var(--coral));
+  background-size:
+    22px 22px,
+    100% 100%;
+  transition: width 0.25s ease;
+  animation: ls-stripes 0.8s linear infinite;
+}
+
+/* Controls card (replaces the view buttons on the loading screen) */
+.ls-controls {
+  width: min(360px, 88vw);
+  margin-top: 0.4rem;
+  padding: 0.85rem 1.1rem 1rem;
+  border: 3px solid #fff;
+  border-radius: 20px;
+  background: rgb(255 255 255 / 0.88);
+  box-shadow:
+    0 5px 0 var(--sand-dark),
+    0 12px 24px rgb(13 40 71 / 0.18);
+  color: var(--ink);
+  text-align: left;
+}
+
+.ls-controls-title {
+  margin: 0 0 0.55rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  text-align: center;
+  color: var(--sea-dark);
+}
+
+.ls-controls-list {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.92rem;
+  font-weight: 500;
+}
+
+.ls-controls-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.ls-controls-keys {
+  display: inline-flex;
+  flex: none;
+  justify-content: flex-end;
+  min-width: 7.6rem;
+}
+
+.ls-controls kbd {
+  border: 1px solid #e3d4ac;
+}
+
+/* Sea strip at the bottom: two looping wave layers, a boat and a tiny palm island. */
+.ls-sea {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 26vh;
+  min-height: 150px;
+  pointer-events: none;
+}
+
+.ls-wave {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 200%; /* path repeats every 50%, so translating -50% loops seamlessly */
+  height: 70%;
+  animation: ls-wave-move linear infinite;
+}
+
+.ls-wave-back {
+  height: 80%;
+  fill: #38b6e0;
+  animation-duration: 14s;
+}
+
+.ls-wave-front {
+  fill: #1f93cf;
+  animation-duration: 9s;
+  animation-direction: reverse;
+}
+
+.ls-boat {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  bottom: 42%;
+  width: clamp(80px, 12vw, 120px);
+  margin-left: -60px;
+  animation: ls-bob 2.4s ease-in-out infinite;
+}
+
+.ls-boat-hull { fill: var(--coral); }
+.ls-boat-trim { fill: #ffffff; }
+.ls-boat-cabin { fill: #ffffff; }
+.ls-boat-window { fill: #9fd4f5; }
+.ls-boat-mast { fill: #6b7787; }
+.ls-boat-flag { fill: var(--sun); }
+
+.ls-island {
+  position: absolute;
+  z-index: 0;
+  left: 5%;
+  bottom: 30%; /* the mound's base dips behind the front wave, so it looks like it's in the water */
+  width: clamp(140px, 20vw, 220px);
+}
+
+/* White sand */
+.ls-sand { fill: #fffaf0; }
+.ls-sand-shade { fill: #eadfc6; }
+.ls-sand-highlight { fill: #ffffff; opacity: 0.9; }
+.ls-coconut { fill: #8a5a34; }
+.ls-trunk {
+  fill: none;
+  stroke: #b47b45;
+  stroke-width: 7;
+  stroke-linecap: round;
+}
+.ls-frond { fill: #3cc25a; }
+
+@keyframes ls-drift {
+  from { left: -180px; }
+  to { left: 100%; }
+}
+
+@keyframes ls-glide {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 30px -10px; }
+}
+
+@keyframes ls-stripes {
+  to { background-position: 22px 0, 0 0; }
+}
+
+
+@keyframes ls-wave-move {
+  to { transform: translateX(-50%); }
+}
+
+@keyframes ls-bob {
+  0%, 100% { transform: translateY(0) rotate(-3deg); }
+  50% { transform: translateY(-8px) rotate(3deg); }
+}
+
+/* ---------- 3D page ---------- */
+.world-page {
+  /* Safe-area-aware HUD edge (notches, home indicator); needs viewport-fit=cover in index.html. */
+  --hud-top: max(16px, env(safe-area-inset-top));
+  --hud-right: max(16px, env(safe-area-inset-right));
+  --hud-bottom: max(16px, env(safe-area-inset-bottom));
+  --hud-left: max(16px, env(safe-area-inset-left));
+  position: fixed;
+  inset: 0;
+}
+
+/* One finger on the canvas must never scroll or zoom the page; CameraRig handles the gestures. */
+.world-page canvas {
+  touch-action: none;
+}
+
+.hud-top {
+  position: absolute;
+  top: var(--hud-top);
+  right: var(--hud-right);
+  left: var(--hud-left);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.6rem;
+  pointer-events: none;
+}
+
+.hud-left {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* ---------- Season picker (custom dropdown, top centre) ---------- */
+.hud-center {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+  pointer-events: auto;
+}
+
+/* Each season's colours: used by the trigger button and as the menu swatches */
+.season-summer { --btn-bg: var(--sea); --btn-edge: var(--sea-dark); --btn-text: var(--ink); --swatch: linear-gradient(135deg, #ffd23f, #2ec4d6); }
+.season-winter { --btn-bg: #dbeafe; --btn-edge: #93b4dd; --btn-text: #1e3a8a; --swatch: linear-gradient(135deg, #ffffff, #93c5fd 55%, #e63946); }
+.season-halloween { --btn-bg: #f97316; --btn-edge: #9a3412; --btn-text: #1a0b00; --swatch: linear-gradient(135deg, #f97316, #6b21a8); }
+.season-valentines { --btn-bg: #f472b6; --btn-edge: #be185d; --btn-text: #3b0a24; --swatch: linear-gradient(135deg, #ffd1e3, #e11d74); }
+
+.season-picker {
+  position: relative;
+}
+
+.season-trigger {
+  min-width: 9.5rem;
+  justify-content: center;
+  gap: 0.6em;
+}
+
+/* CSS-drawn chevron that flips when the menu is open */
+.season-caret {
+  width: 0.5em;
+  height: 0.5em;
+  margin-top: -0.2em;
+  border-right: 2.5px solid currentColor;
+  border-bottom: 2.5px solid currentColor;
+  transform: rotate(45deg);
+  transition: transform 0.18s ease, margin 0.18s ease;
+}
+
+.season-caret.is-open {
+  margin-top: 0.25em;
+  transform: rotate(-135deg);
+}
+
+.season-menu {
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 50%;
+  z-index: 5;
+  display: grid;
+  gap: 0.35rem;
+  width: max-content;
+  min-width: 15.5rem;
+  margin: 0;
+  padding: 0.5rem;
+  border: 3px solid #fff;
+  border-radius: 22px;
+  background: rgb(255 250 240 / 0.97);
+  box-shadow:
+    0 6px 0 var(--sand-dark),
+    0 18px 40px rgb(13 40 71 / 0.3);
+  list-style: none;
+  transform: translateX(-50%);
+  transform-origin: top center;
+  animation: season-menu-in 0.18s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+  outline: none;
+}
+
+/* Little speech-bubble notch pointing at the button */
+.season-menu::before {
+  content: '';
+  position: absolute;
+  top: -9px;
+  left: 50%;
+  width: 14px;
+  height: 14px;
+  border-top: 3px solid #fff;
+  border-left: 3px solid #fff;
+  background: rgb(255 250 240 / 0.97);
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.season-menu:focus-visible {
+  box-shadow:
+    0 0 0 3px var(--ink),
+    0 6px 0 var(--sand-dark),
+    0 18px 40px rgb(13 40 71 / 0.3);
+}
+
+@keyframes season-menu-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(-6px) scale(0.96); }
+}
+
+.season-option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.55rem 0.75rem 0.55rem 0.55rem;
+  border-radius: 16px;
+  color: var(--ink);
+  font-family: var(--font-display);
+  cursor: pointer;
+  transition: background 0.12s ease, transform 0.12s ease;
+}
+
+.season-option.is-active {
+  background: #fff;
+  box-shadow: 0 3px 0 #f1e6c8;
+  transform: translateX(2px);
+}
+
+.season-swatch {
+  width: 34px;
+  height: 34px;
+  flex: none;
+  border: 3px solid #fff;
+  border-radius: 12px;
+  background: var(--swatch);
+  box-shadow: 0 3px 0 rgb(13 40 71 / 0.15);
+}
+
+.season-option-text {
+  display: grid;
+  flex: 1;
+  line-height: 1.2;
+}
+
+.season-option-label {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.season-option-blurb {
+  color: #6b7a8c;
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+
+/* Tick for the current season, drawn in CSS */
+.season-check {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  border-radius: 50%;
+}
+
+.season-option.is-selected .season-check {
+  background: var(--btn-bg);
+  box-shadow: 0 2px 0 var(--btn-edge);
+}
+
+.season-option.is-selected .season-check::after {
+  content: '';
+  display: block;
+  width: 6px;
+  height: 11px;
+  margin: 3px auto 0;
+  border-right: 2.5px solid var(--btn-text);
+  border-bottom: 2.5px solid var(--btn-text);
+  transform: rotate(45deg);
+}
+
+/* Day/night toggle (top-left of the 3D HUD) */
+.daynight {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-night {
+  --btn-bg: #33407a;
+  --btn-edge: #1d2550;
+  --btn-text: #ffffff;
+}
+
+.daynight-auto {
+  opacity: 0.85;
+}
+
+.daynight-auto.is-on {
+  --btn-bg: var(--sea);
+  --btn-edge: var(--sea-dark);
+  --btn-text: var(--ink);
+  opacity: 1;
+}
+
+.hud-top > * {
+  pointer-events: auto;
+}
+
+.hud-hint {
+  position: absolute;
+  bottom: var(--hud-bottom);
+  left: 50%;
+  transform: translateX(-50%);
+  /* Keep clear of the minimap in the bottom-right corner */
+  max-width: calc(100% - 2 * 236px);
+  margin: 0;
+  padding: 0.45em 1.1em;
+  border: 2px solid #fff;
+  border-radius: 999px;
+  background: var(--sand);
+  box-shadow:
+    0 4px 0 var(--sand-dark),
+    0 8px 14px rgb(13 40 71 / 0.18);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-align: center;
+  width: max-content;
+  pointer-events: none;
+}
+
+.hud-hint-sep {
+  margin: 0 0.4em;
+  opacity: 0.5;
+}
+
+kbd {
+  display: inline-block;
+  min-width: 1.7em;
+  margin-right: 0.25em;
+  padding: 0 0.35em;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 2px 0 var(--sand-dark);
+  font: inherit;
+  font-size: 0.85em;
+  font-weight: 600;
+  text-align: center;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.btn-small {
+  padding: 0.4em 0.85em;
+  font-size: 0.85rem;
+  border-radius: 12px;
+}
+
+/* ---------- Dock prompt ---------- */
+.dock-prompt {
+  position: absolute;
+  bottom: 76px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.45rem 0.5rem 0.45rem 1.1rem;
+  border: 3px solid #fff;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.92);
+  box-shadow:
+    0 5px 0 var(--sand-dark),
+    0 12px 24px rgb(13 40 71 / 0.25);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-weight: 600;
+  white-space: nowrap;
+  max-width: calc(100% - 24px);
+  animation: dock-prompt-in 0.25s ease-out, dock-prompt-bob 2s ease-in-out 0.25s infinite;
+}
+
+.dock-prompt-text {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 1.05rem;
+  text-overflow: ellipsis;
+}
+
+.dock-prompt .btn {
+  flex: none;
+  min-height: 48px; /* comfortable thumb target */
+  padding: 0.65em 1.45em;
+  font-size: 1.15rem;
+  border-radius: 18px;
+}
+
+.dock-prompt .btn kbd {
+  margin-right: 0;
+  box-shadow: 0 2px 0 var(--sun-dark);
+}
+
+@keyframes dock-prompt-in {
+  from { opacity: 0; transform: translate(-50%, 12px); }
+}
+
+@keyframes dock-prompt-bob {
+  0%, 100% { transform: translate(-50%, 0); }
+  50% { transform: translate(-50%, -4px); }
+}
+
+/* ---------- Minimap / quick travel (bottom-right) ---------- */
+.minimap {
+  position: absolute;
+  right: var(--hud-right);
+  bottom: var(--hud-bottom);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.minimap-body {
+  position: relative;
+  width: 184px;
+  height: 184px;
+  border: 4px solid #fff;
+  border-radius: 50%;
+  box-shadow:
+    0 5px 0 var(--sand-dark),
+    0 12px 24px rgb(13 40 71 / 0.25);
+}
+
+.minimap-chart {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+.minimap-sea {
+  fill: #8fd8ee;
+}
+
+:root[data-theme='dark'] .minimap-sea {
+  fill: #24507a;
+}
+
+.minimap-edge {
+  fill: none;
+  stroke: rgb(255 255 255 / 0.65);
+  stroke-width: 2;
+  stroke-dasharray: 6 6;
+}
+
+.minimap-islet {
+  fill: var(--sand);
+}
+
+.minimap-island {
+  fill: #9fd05a;
+  stroke: var(--sand);
+  stroke-width: 4;
+}
+
+.minimap-boat {
+  fill: var(--coral);
+  stroke: #fff;
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+}
+
+.minimap-pins {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.minimap-pin {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: rgb(255 250 240 / 0.95);
+  box-shadow: 0 2px 0 var(--sand-dark);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  transform: translate(-50%, -50%);
+  transition: transform 0.12s ease;
+}
+
+.minimap-pin:hover {
+  transform: translate(-50%, -50%) scale(1.15);
+}
+
+.minimap-pin:disabled {
+  cursor: default;
+}
+
+/* Island name tooltip on hover / keyboard focus (the button's aria-label carries it for screen readers) */
+.minimap-pin::after {
+  content: attr(data-label);
+  position: absolute;
+  bottom: calc(100% + 5px);
+  left: 50%;
+  padding: 0.15em 0.6em;
+  border-radius: 999px;
+  background: var(--ink);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%);
+  transition: opacity 0.15s ease;
+}
+
+.minimap-pin:hover::after,
+.minimap-pin:focus-visible::after {
+  opacity: 1;
+}
+
+/* Quick-travel fade: briefly covers the screen while the boat jumps */
+.travel-fade {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: #0d2847;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.28s ease;
+}
+
+.travel-fade.is-on {
+  opacity: 1;
+}
+
+/* ---------- Touch joystick (bottom-left, touch devices only) ---------- */
+.joystick {
+  position: absolute;
+  bottom: calc(var(--hud-bottom) + 8px);
+  left: calc(var(--hud-left) + 8px);
+  width: 132px;
+  height: 132px;
+  border: 3px solid rgb(255 255 255 / 0.7);
+  border-radius: 50%;
+  background: rgb(13 40 71 / 0.22);
+  backdrop-filter: blur(2px);
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.joystick-knob {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 60px;
+  height: 60px;
+  margin: -30px 0 0 -30px;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.75);
+  box-shadow: 0 4px 0 rgb(13 40 71 / 0.25);
+  pointer-events: none;
+}
+
+/* ---------- Touch layout: joystick bottom-left, map bottom-right, so the rest moves up ---------- */
+.is-touch .hud-hint {
+  top: calc(var(--hud-top) + 64px);
+  bottom: auto;
+  max-width: calc(100% - 32px);
+  font-size: 0.8rem;
+}
+
+.is-touch .dock-prompt {
+  bottom: calc(var(--hud-bottom) + 160px);
+}
+
+/* ---------- Compact HUD (tablets and phones): icon-only buttons in the top bar ----------
+   960px, not 768: with labels, the left group (Day, Auto, Motion) would run under the centred
+   season picker before that. */
+@media (max-width: 960px) {
+  /* Same technique as .visually-hidden: the label stays the button's accessible name. */
+  .hud-top .btn-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .hud-top .btn {
+    gap: 0.3em;
+    padding: 0.55em 0.7em;
+  }
+
+  .hud-top .btn-icon {
+    font-size: 1.25em;
+  }
+
+  .hud-top .view-switcher {
+    gap: 0.45rem;
+  }
+
+  .hud-left {
+    gap: 0.45rem;
+  }
+
+  .season-trigger {
+    min-width: 0;
+  }
+}
+
+/* No room for the keyboard hint beside the map on narrow mouse/keyboard windows */
+@media (max-width: 700px) {
+  .world-page:not(.is-touch) .hud-hint {
+    display: none;
+  }
+}
+
+/* Narrow screens: the centred prompt would overlap the map, so lift it above the map's height */
+@media (max-width: 760px) {
+  .dock-prompt,
+  .is-touch .dock-prompt {
+    bottom: calc(var(--hud-bottom) + 250px);
+  }
+}
+
+@media (max-width: 480px) {
+  /* No room to centre the season picker over three left-hand buttons: put it in the row instead. */
+  .hud-center {
+    position: static;
+    transform: none;
+  }
+
+  .hud-top .btn {
+    padding: 0.5em 0.6em;
+  }
+
+  .minimap-body {
+    width: 148px;
+    height: 148px;
+  }
+
+  .minimap-pin {
+    width: 28px;
+    height: 28px;
+    font-size: 0.85rem;
+  }
+
+  /* Phones: the smaller map needs less clearance */
+  .dock-prompt,
+  .is-touch .dock-prompt {
+    bottom: calc(var(--hud-bottom) + 216px);
+  }
+}
+
+/* ---------- Island details modal (native <dialog>) ---------- */
+.section-modal {
+  /* Desktop: a card centred on screen; its height follows the content, up to the viewport. */
+  width: min(640px, calc(100% - 32px));
+  max-width: none;
+  height: auto;
+  max-height: calc(100% - 48px);
+  margin: auto;
+  padding: 0;
+  border: 4px solid #fff;
+  border-radius: 28px;
+  background: #fffaf0;
+  box-shadow:
+    0 8px 0 var(--sand-dark),
+    0 24px 60px rgb(13 40 71 / 0.35);
+  color: var(--ink);
+  overflow: hidden;
+}
+
+.section-modal[open] {
+  animation: modal-in 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+
+.section-modal::backdrop {
+  background: rgb(13 40 71 / 0.3);
+  backdrop-filter: blur(2px);
+}
+
+@keyframes modal-in {
+  from { opacity: 0; transform: translateY(24px) scale(0.96); }
+}
+
+.section-modal-inner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  /* The dialog's height is auto, so cap the inner column too; the body scrolls when needed. */
+  max-height: calc(100vh - 48px);
+  max-height: calc(100dvh - 48px);
+}
+
+.section-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1rem 1rem 1.25rem;
+  /* Deep enough teal for the white title to pass AA (the bright --sea is only ~2:1 with white). */
+  background: linear-gradient(135deg, #0e6f7e, #13889a);
+  color: #fff;
+}
+
+.section-modal-icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  flex: none;
+  border-radius: 14px;
+  background: rgb(255 255 255 / 0.9);
+  box-shadow: 0 3px 0 var(--sea-dark);
+  font-size: 1.6rem;
+}
+
+.section-modal-title {
+  flex: 1;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 4vw, 1.6rem);
+  font-weight: 600;
+  line-height: 1.15;
+  text-shadow: 0 2px 0 #08505b;
+}
+
+.section-modal-close {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  flex: none;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  background: var(--coral);
+  box-shadow: 0 3px 0 var(--coral-dark);
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.12s ease;
+}
+
+.section-modal-close:hover {
+  transform: rotate(90deg);
+}
+
+.section-modal-body {
+  flex: 1;
+  min-height: 0; /* lets the flex child shrink so it scrolls instead of overflowing */
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 1.25rem;
+}
+
+.section-modal-footer {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.9rem 1.25rem 1.1rem;
+  border-top: 2px dashed var(--sand);
+  background: #fff6e2;
+}
+
+.section-modal-hint {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.section-modal-hint kbd {
+  background: #fff;
+}
+
+/* Phones: full-screen sheet */
+@media (max-width: 640px) {
+  .section-modal {
+    width: 100%;
+    height: 100%;
+    max-height: none;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .section-modal-inner {
+    max-height: none;
+  }
+
+  .section-modal[open] {
+    animation-name: modal-up;
+  }
+
+  @keyframes modal-up {
+    from { opacity: 0; transform: translateY(40px); }
+  }
+
+  .section-modal-hint {
+    display: none;
+  }
+}
+
+/* ---------- Section content (shared by the 3D modal and the 2D view; 2D re-tints it below) ---------- */
+.sec {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.sec p {
+  margin: 0;
+}
+
+.sec-heading {
+  margin: 0.75rem 0 0.1rem;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #12707e; /* darker than --sea-dark, which is only ~3.7:1 on the modal's cream */
+}
+
+.sec-heading:first-child {
+  margin-top: 0;
+}
+
+.sec-name {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 600;
+}
+
+.sec-text {
+  line-height: 1.6;
+}
+
+/* Bio paragraphs: justified, with hyphenation so narrow screens don't get big gaps between words */
+.sec-bio {
+  text-align: justify;
+  hyphens: auto;
+}
+
+.sec-strong {
+  font-weight: 600;
+}
+
+.sec-muted {
+  color: #5b6b80;
+  font-size: 0.92rem;
+}
+
+.sec-link {
+  color: #12707e;
+  font-weight: 600;
+}
+
+.sec-profile {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.sec-avatar {
+  width: 88px;
+  height: 88px;
+  flex: none;
+  border: 4px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 4px 0 var(--sand-dark);
+  object-fit: cover;
+}
+
+.sec-avatar-placeholder {
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, var(--sun), var(--coral));
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  font-weight: 600;
+}
+
+.chip-list,
+.link-list,
+.card-list,
+.howto {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chip {
+  padding: 0.3em 0.75em;
+  border-radius: 999px;
+  background: #e3f7fa;
+  box-shadow: inset 0 -2px 0 rgb(26 143 160 / 0.25);
+  color: #12707e;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.chip-sun {
+  background: #fff1c2;
+  box-shadow: inset 0 -2px 0 rgb(224 168 0 / 0.35);
+  color: #8a6400;
+}
+
+.chip-list-small .chip {
+  font-size: 0.78rem;
+}
+
+.card-list {
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.sec-card {
+  display: flex;
+  gap: 0.9rem;
+  padding: 0.9rem 1rem;
+  border: 2px solid #f1e6c8;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 4px 0 #f1e6c8;
+}
+
+.sec-card-project {
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+}
+
+.sec-card-project .sec-card-body {
+  padding: 0.9rem 1rem 1rem;
+}
+
+.sec-card-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border-radius: 12px;
+  background: #fff1c2;
+  font-size: 1.4rem;
+}
+
+.sec-card-body {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.sec-card-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+/* Screenshot grid: column count set per project (--shot-cols: 6 → 3×2, 4 → 2×2), rounded thumbnails */
+.project-shots {
+  display: grid;
+  grid-template-columns: repeat(var(--shot-cols, 3), minmax(0, 1fr));
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0.6rem 0.6rem 0;
+  list-style: none;
+}
+
+.project-shot {
+  display: block;
+  width: 100%;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 12px;
+  background: #e9eef3;
+  aspect-ratio: 16 / 9;
+  cursor: zoom-in;
+}
+
+.project-shot img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.project-shot:hover img,
+.project-shot:focus-visible img {
+  transform: scale(1.06);
+}
+
+/* ---------- Screenshot viewer (Lightbox, native <dialog>) ---------- */
+.lightbox {
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  margin: 0;
+  padding: 64px 72px 24px;
+  border: 0;
+  background: transparent;
+  color: #fff;
+}
+
+.lightbox[open] {
+  display: grid;
+  place-items: center;
+  animation: lightbox-in 0.28s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+}
+
+.lightbox::backdrop {
+  background: rgb(8 18 36 / 0.85);
+  backdrop-filter: blur(4px);
+  animation: lightbox-fade 0.28s ease;
+}
+
+.lightbox.is-closing {
+  animation: lightbox-out 0.2s ease forwards;
+}
+
+.lightbox.is-closing::backdrop {
+  animation: lightbox-fade 0.2s ease reverse forwards;
+}
+
+.lightbox-figure {
+  display: grid;
+  justify-items: center;
+  gap: 0.75rem;
+  max-width: 1200px;
+  margin: 0;
+}
+
+.lightbox-img {
+  display: block;
+  max-width: 100%;
+  max-height: calc(100vh - 150px);
+  max-height: calc(100dvh - 150px);
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgb(0 0 0 / 0.45);
+  animation: lightbox-img-in 0.3s ease;
+}
+
+.lightbox-caption {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.lightbox-close,
+.lightbox-nav {
+  position: fixed;
+  display: grid;
+  place-items: center;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.lightbox-close {
+  top: max(16px, env(safe-area-inset-top));
+  right: max(16px, env(safe-area-inset-right));
+  width: 44px;
+  height: 44px;
+  background: var(--coral);
+  box-shadow: 0 3px 0 var(--coral-dark);
+  color: var(--ink);
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.lightbox-close:hover {
+  transform: rotate(90deg);
+}
+
+.lightbox-nav {
+  top: 50%;
+  width: 48px;
+  height: 48px;
+  padding: 0 0 4px;
+  background: rgb(255 255 255 / 0.92);
+  box-shadow: 0 3px 0 var(--sand-dark);
+  color: var(--ink);
+  font-size: 2rem;
+  line-height: 1;
+  transform: translateY(-50%);
+}
+
+.lightbox-nav:hover {
+  transform: translateY(-50%) scale(1.1);
+}
+
+.lightbox-prev {
+  left: max(12px, env(safe-area-inset-left));
+}
+
+.lightbox-next {
+  right: max(12px, env(safe-area-inset-right));
+}
+
+.lightbox :focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+}
+
+/* Phones: arrows sit at the bottom corners so the image can use the full width */
+@media (max-width: 640px) {
+  .lightbox {
+    padding: 64px 12px 84px;
+  }
+
+  .lightbox-nav {
+    top: auto;
+    bottom: max(16px, env(safe-area-inset-bottom));
+    transform: none;
+  }
+
+  .lightbox-nav:hover {
+    transform: scale(1.1);
+  }
+}
+
+@keyframes lightbox-in {
+  from { opacity: 0; transform: scale(0.94); }
+}
+
+@keyframes lightbox-out {
+  to { opacity: 0; transform: scale(0.96); }
+}
+
+@keyframes lightbox-fade {
+  from { opacity: 0; }
+}
+
+@keyframes lightbox-img-in {
+  from { opacity: 0; transform: scale(0.98); }
+}
+
+.project-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+}
+
+.skill-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+
+.skill-group {
+  padding: 0.75rem 0.9rem;
+  border-radius: 16px;
+  background: #fff;
+  border: 2px solid #f1e6c8;
+}
+
+.skill-group-title {
+  margin: 0 0 0.5rem;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+/* Education timeline: a dotted line with a dot per entry */
+.timeline {
+  position: relative;
+  display: grid;
+  gap: 0.9rem;
+  margin: 0;
+  padding: 0 0 0 1.4rem;
+  list-style: none;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  top: 0.5rem;
+  bottom: 0.5rem;
+  left: 0.45rem;
+  border-left: 3px dotted var(--sea);
+}
+
+.timeline-item {
+  position: relative;
+}
+
+.timeline-dot {
+  position: absolute;
+  top: 1.2rem;
+  left: -1.3rem;
+  width: 14px;
+  height: 14px;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  background: var(--coral);
+  box-shadow: 0 0 0 2px var(--coral);
+}
+
+.howto {
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.howto li {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.howto-keys {
+  display: inline-flex;
+  min-width: 7.5rem;
+}
+
+.howto kbd,
+.section-modal-hint kbd {
+  border: 1px solid #e3d4ac;
+}
+
+/* ---------- 2D view ---------- */
+.view-2d {
+  /* Season accent shades that keep AA contrast whatever the season: --accent-ink for text and
+     outlines on the page, --accent-strong behind white text. (Raw --accent is too light for both.) */
+  --accent-ink: color-mix(in srgb, var(--accent) 70%, #000);
+  --accent-strong: color-mix(in srgb, var(--accent) 70%, #000);
+  --card-bg: #ffffff;
+  --card-edge: #f1e6c8;
+  --nav-h: 4.25rem;
+  position: relative;
+  min-height: 100vh;
+  color: var(--text);
+  overflow-x: clip;
+}
+
+:root[data-theme='dark'] .view-2d {
+  --accent-ink: color-mix(in srgb, var(--accent) 55%, #fff);
+  --text: #f1f5f9;
+  --text-muted: #c3cedd;
+  --card-bg: #1a2540;
+  --card-edge: #2a3a5c;
+}
+
+/* :where() keeps these as weak as the global rules, so .btn, .navbar-link etc. still win. */
+:where(.view-2d) a {
+  color: var(--accent-ink);
+}
+
+:where(.view-2d) :focus-visible {
+  outline-color: var(--accent-ink);
+}
+
+/* Sections and <main> receive focus from in-page links; no ring around a whole section. */
+.view-2d [tabindex='-1']:focus {
+  outline: none;
+}
+
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 16px;
+  z-index: 30;
+  padding: 0.6em 1em;
+  border-radius: 12px;
+  background: var(--accent-strong);
+  color: #fff;
+  font-weight: 600;
+}
+
+.skip-link:focus {
+  top: 12px;
+}
+
+/* Navbar: sticky, frosted, collapses into a menu button below 1080px */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface) 96%, transparent);
+  backdrop-filter: blur(10px);
+}
+
+.navbar-inner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  max-width: 1200px;
+  min-height: var(--nav-h);
+  margin: 0 auto;
+  padding: 0.6rem 16px;
+}
+
+.navbar-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.navbar-brand-mark {
+  display: grid;
+  place-items: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 50%;
+  background: var(--accent-strong);
+  color: #fff;
+}
+
+.navbar-menu {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 1rem;
+}
+
+.navbar-links {
+  display: flex;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.navbar-link {
+  display: block;
+  padding: 0.45em 0.7em;
+  border-radius: 10px;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color 0.15s ease;
+}
+
+.navbar-link:hover {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+.navbar-link[aria-current='true'] {
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  box-shadow: inset 0 -3px 0 var(--accent-ink);
+  color: var(--accent-ink);
+}
+
+.navbar-tools {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-left: auto;
+}
+
+.navbar .view-switcher {
+  flex-wrap: nowrap;
+  gap: 0.5rem;
+}
+
+.navbar .btn {
+  white-space: nowrap;
+}
+
+.navbar .btn {
+  padding: 0.45em 0.85em;
+  font-size: 0.85rem;
+}
+
+/* Hamburger: three CSS bars that turn into an X while the menu is open */
+.navbar-toggle {
+  display: none;
+  align-items: center;
+  gap: 0.6rem;
+  margin-left: auto;
+  padding: 0.55em 0.85em;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.navbar-toggle-bars,
+.navbar-toggle-bars::before,
+.navbar-toggle-bars::after {
+  display: block;
+  width: 18px;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+  transition: transform 0.2s ease;
+}
+
+.navbar-toggle-bars {
+  position: relative;
+}
+
+.navbar-toggle-bars::before,
+.navbar-toggle-bars::after {
+  content: '';
+  position: absolute;
+  left: 0;
+}
+
+.navbar-toggle-bars::before {
+  top: -6px;
+}
+
+.navbar-toggle-bars::after {
+  top: 6px;
+}
+
+.navbar-toggle[aria-expanded='true'] .navbar-toggle-bars {
+  background: transparent;
+}
+
+.navbar-toggle[aria-expanded='true'] .navbar-toggle-bars::before {
+  transform: translateY(6px) rotate(45deg);
+}
+
+.navbar-toggle[aria-expanded='true'] .navbar-toggle-bars::after {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
+@media (max-width: 1079px) {
+  .navbar-inner {
+    position: relative;
+  }
+
+  .navbar-toggle {
+    display: inline-flex;
+  }
+
+  /* A dropdown card under the Menu button, only as wide as its contents */
+  .navbar-menu {
+    position: absolute;
+    top: calc(100% - 0.25rem);
+    right: 16px;
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    width: max-content;
+    min-width: 220px;
+    max-width: calc(100vw - 32px);
+    max-height: calc(100vh - var(--nav-h) - 16px);
+    max-height: calc(100dvh - var(--nav-h) - 16px);
+    overflow-y: auto;
+    padding: 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    background: var(--surface);
+    box-shadow: 0 16px 40px rgb(13 40 71 / 0.22);
+  }
+
+  .navbar-menu.is-open {
+    display: flex;
+  }
+
+  .navbar-links {
+    flex-direction: column;
+  }
+
+  .navbar-link {
+    padding: 0.7em 0.8em;
+  }
+
+  .navbar-tools {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+    margin-left: 0;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .navbar .view-switcher {
+    flex-direction: column;
+  }
+
+  .navbar-tools .btn,
+  .theme-toggle {
+    justify-content: center;
+  }
+}
+
+/* Light/dark mode switch */
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45em 0.85em;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.theme-toggle:hover {
+  border-color: var(--accent-ink);
+}
+
+.theme-toggle-icon,
+.theme-toggle .btn-icon {
+  line-height: 1;
+}
+
+/* Desktop navbar: the Motion button is icon-only (its label stays as the accessible name);
+   the phone dropdown has room for the full label. */
+@media (min-width: 1080px) {
+  .navbar .motion-toggle .btn-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}
+
+.fallback-banner {
+  margin: 0;
+  padding: 0.75rem 16px;
+  background: var(--accent-strong);
+  color: #fff;
+  text-align: center;
+}
+
+.view-2d-main {
+  position: relative;
+  z-index: 1;
+}
+
+/* Hero */
+.hero {
+  position: relative;
+  padding: clamp(3rem, 9vw, 6rem) 16px clamp(3.5rem, 8vw, 5rem);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 16%, var(--bg)), var(--bg));
+  scroll-margin-top: var(--nav-h);
+}
+
+.hero-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.hero-eyebrow {
+  margin: 0;
+  color: var(--accent-ink);
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.hero-title {
+  margin: 0.15rem 0 0.35rem;
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 7vw, 4rem);
+  font-weight: 600;
+  line-height: 1.05;
+}
+
+.hero-headline {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.15rem, 3vw, 1.5rem);
+  font-weight: 500;
+}
+
+.hero-tagline {
+  max-width: 38rem;
+  margin: 0.9rem 0 0;
+  color: var(--text-muted);
+  font-size: 1.05rem;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 1.75rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Seasonal hero art (CSS only, keyed off <html data-season>) */
+.hero-art {
+  position: absolute;
+  top: clamp(1.5rem, 5vw, 3rem);
+  right: max(16px, calc(50% - 480px));
+  font-size: clamp(3.5rem, 12vw, 7rem);
+  line-height: 1;
+  opacity: 0.9;
+}
+
+[data-season='summer'] .hero-art::before {
+  content: '';
+  display: block;
+  width: 0.8em;
+  height: 0.8em;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff3b0, var(--sun) 55%, var(--sun-dark));
+  box-shadow:
+    0 0 0 0.12em rgb(255 210 63 / 0.28),
+    0 0 0 0.26em rgb(255 210 63 / 0.12);
+}
+
+[data-season='winter'] .hero-art::before {
+  content: '⛄';
+}
+
+[data-season='halloween'] .hero-art::before {
+  content: '🎃';
+}
+
+[data-season='valentines'] .hero-art::before {
+  content: '💝';
+}
+
+@media (max-width: 600px) {
+  .hero-art {
+    opacity: 0.3;
+  }
+}
+
+/* A row of little wave crests along the bottom of the hero */
+.hero-wave {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 14px;
+  background: radial-gradient(
+      circle at 12px -4px,
+      transparent 10px,
+      color-mix(in srgb, var(--accent) 45%, transparent) 11px 13px,
+      transparent 14px
+    )
+    repeat-x;
+  background-size: 24px 14px;
+}
+
+[data-season='summer'] .hero-wave {
+  background-image: radial-gradient(circle at 12px -4px, transparent 10px, var(--sea) 11px 13px, transparent 14px);
+}
+
+/* Content sections */
+.view-2d-sections {
+  display: grid;
+  gap: 3rem;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem 16px 3.5rem;
+}
+
+.view-2d-section {
+  scroll-margin-top: calc(var(--nav-h) + 1rem);
+}
+
+.view-2d-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin: 0 0 1rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+.view-2d-heading-icon {
+  display: grid;
+  place-items: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  flex: none;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--accent) 16%, var(--surface));
+  font-size: 1.4rem;
+}
+
+.view-2d-panel {
+  padding: clamp(1rem, 3vw, 1.75rem);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  background: var(--surface);
+  box-shadow: 0 10px 30px rgb(13 40 71 / 0.08);
+}
+
+/* The shared section styles are tuned for the always-light 3D modal; re-tint them for 2D's light/dark + accent. */
+.view-2d .sec-heading,
+.view-2d .sec-link {
+  color: var(--accent-ink);
+}
+
+.view-2d .sec-muted {
+  color: var(--text-muted);
+}
+
+.view-2d .sec-card,
+.view-2d .skill-group {
+  border-color: var(--card-edge);
+  background: var(--card-bg);
+}
+
+.view-2d .sec-card {
+  box-shadow: 0 4px 0 var(--card-edge);
+}
+
+.view-2d .chip {
+  background: color-mix(in srgb, var(--accent) 10%, var(--surface));
+  box-shadow: inset 0 -2px 0 color-mix(in srgb, var(--accent) 30%, transparent);
+  color: var(--accent-ink);
+}
+
+.view-2d .chip-sun {
+  background: #fff1c2;
+  box-shadow: inset 0 -2px 0 rgb(224 168 0 / 0.35);
+  color: #8a6400;
+}
+
+.view-2d .timeline::before {
+  border-left-color: var(--accent);
+}
+
+.view-2d .timeline-dot {
+  border-color: var(--surface);
+}
+
+.view-2d-footer {
+  position: relative;
+  z-index: 1;
+  padding: 2rem 16px 2.5rem;
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  text-align: center;
+}
+
+.view-2d-footer p {
+  margin: 0.25rem 0;
+}
+
+/* Seasonal drifting bits behind the page (SeasonDecor). Summer has none. */
+.decor {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+[data-season='summer'] .decor {
+  display: none;
+}
+
+.decor-bit {
+  position: absolute;
+  top: 0;
+  left: calc(var(--x) * 1%);
+  font-size: calc(var(--s) * 1rem);
+  line-height: 1;
+  will-change: transform;
+}
+
+/* \FE0E asks for the plain text glyph rather than the emoji, so `color` applies. */
+[data-season='winter'] .decor-bit {
+  color: #9cc4ea;
+  opacity: 0.8;
+  animation: decor-fall calc(var(--t) * 1s) linear calc(var(--d) * -1s) infinite;
+}
+
+[data-season='winter'] .decor-bit::before {
+  content: '❄\FE0E';
+}
+
+:root[data-theme='dark'][data-season='winter'] .decor-bit {
+  color: #fff;
+  opacity: 0.45;
+}
+
+[data-season='valentines'] .decor-bit {
+  color: var(--accent);
+  opacity: 0.3;
+  animation: decor-rise calc(var(--t) * 1s) linear calc(var(--d) * -1s) infinite;
+}
+
+[data-season='valentines'] .decor-bit::before {
+  content: '♥\FE0E';
+}
+
+/* Halloween: just four bats flapping across the top half */
+[data-season='halloween'] .decor-bit {
+  top: calc(var(--x) * 1.2vh + 8vh);
+  left: 0;
+  opacity: 0.75;
+  animation: decor-fly calc(var(--t) * 1.4s) linear calc(var(--d) * -1s) infinite;
+}
+
+[data-season='halloween'] .decor-bit::before {
+  content: '🦇';
+}
+
+[data-season='halloween'] .decor-bit:nth-child(n + 5) {
+  display: none;
+}
+
+@keyframes decor-fall {
+  from { transform: translate3d(0, -10vh, 0) rotate(0deg); }
+  to { transform: translate3d(4vw, 110vh, 0) rotate(300deg); }
+}
+
+@keyframes decor-rise {
+  from { transform: translate3d(0, 110vh, 0) scale(0.8); }
+  to { transform: translate3d(-3vw, -10vh, 0) scale(1.15); }
+}
+
+@keyframes decor-fly {
+  0% { transform: translate3d(-10vw, 0, 0); }
+  25% { transform: translate3d(20vw, -3vh, 0); }
+  50% { transform: translate3d(50vw, 2vh, 0); }
+  75% { transform: translate3d(80vw, -2vh, 0); }
+  100% { transform: translate3d(110vw, 0, 0); }
+}
+
+/* ---------- Locked "coming soon" buttons (ComingSoonButton) ---------- */
+.coming-soon {
+  position: relative;
+  display: inline-flex;
+}
+
+.btn.is-locked {
+  position: relative;
+  filter: saturate(0.7);
+}
+
+.lock-badge {
+  position: absolute;
+  top: -8px;
+  right: -6px;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: var(--ink);
+  font-size: 0.6rem;
+  line-height: 1;
+}
+
+.coming-soon-bubble {
+  position: absolute;
+  top: calc(100% + 12px);
+  z-index: 30;
+  width: max-content;
+  max-width: min(260px, calc(100vw - 32px));
+  padding: 0.55em 0.9em;
+  border: 3px solid #fff;
+  border-radius: 16px;
+  background: var(--ink);
+  box-shadow: 0 8px 20px rgb(13 40 71 / 0.3);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 0.88rem;
+  font-weight: 600;
+  line-height: 1.35;
+  text-align: left;
+  white-space: normal;
+  pointer-events: none;
+  animation: bubble-in 0.2s ease-out;
+}
+
+/* Stays in the DOM while closed (it's the live region), just invisible */
+.coming-soon-bubble:empty {
+  padding: 0;
+  border: 0;
+  box-shadow: none;
+  opacity: 0;
+  animation: none;
+}
+
+.coming-soon-start .coming-soon-bubble {
+  left: 0;
+}
+
+.coming-soon-end .coming-soon-bubble {
+  right: 0;
+}
+
+.coming-soon-center .coming-soon-bubble {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+@keyframes bubble-in {
+  from { opacity: 0; margin-top: -6px; }
+}
+
+/* In the phone dropdown menu the buttons are full width */
+@media (max-width: 1079px) {
+  .navbar .coming-soon,
+  .navbar .coming-soon .btn {
+    width: 100%;
+  }
+}
+
+/* ---------- Error page (e.g. /resume while it's locked) ---------- */
+.error-page {
+  --accent-ink: color-mix(in srgb, var(--accent) 70%, #000);
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 24px 16px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 18%, var(--bg)), var(--bg) 70%);
+  color: var(--text);
+}
+
+:root[data-theme='dark'] .error-page {
+  --accent-ink: color-mix(in srgb, var(--accent) 55%, #fff);
+}
+
+.error-card {
+  width: min(480px, 100%);
+  padding: 2rem 1.5rem 1.75rem;
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  background: var(--surface);
+  box-shadow: 0 20px 50px rgb(13 40 71 / 0.15);
+  text-align: center;
+}
+
+/* A little sand island with the icon sitting on it, and a scalloped sea below */
+.error-art {
+  position: relative;
+  width: 160px;
+  height: 110px;
+  margin: 0 auto 1rem;
+}
+
+.error-art-icon {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: 1;
+  margin-left: -0.5em;
+  font-size: 3.2rem;
+  line-height: 1;
+  animation: error-bob 3s ease-in-out infinite;
+}
+
+.error-art-island {
+  position: absolute;
+  right: 20px;
+  bottom: 22px;
+  left: 20px;
+  height: 40px;
+  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  background: var(--sand);
+  box-shadow: inset 0 -6px 0 var(--sand-dark);
+}
+
+.error-art-wave {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 26px;
+  border-radius: 0 0 20px 20px;
+  background: radial-gradient(circle at 10px 0, transparent 9px, var(--sea) 10px) repeat-x;
+  background-size: 20px 26px;
+}
+
+@keyframes error-bob {
+  0%, 100% { transform: translateY(0) rotate(-4deg); }
+  50% { transform: translateY(-6px) rotate(4deg); }
+}
+
+.error-code {
+  margin: 0;
+  color: var(--accent-ink);
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.error-title {
+  margin: 0.3rem 0 0.5rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 5vw, 2.1rem);
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+.error-message {
+  max-width: 34ch;
+  margin: 0 auto 1.5rem;
+  color: var(--text-muted);
+}
+
+.error-actions {
+  justify-content: center;
+}
+
+/* ---------- Text-only résumé: always black on white, no theme colours, prints cleanly ---------- */
+.resume {
+  min-height: 100vh;
+  background: #fff;
+  color: #000;
+  color-scheme: light;
+}
+
+.resume a {
+  color: #000;
+  overflow-wrap: anywhere;
+}
+
+.resume :focus-visible {
+  outline-color: #000;
+}
+
+.resume-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1.25rem;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1rem 16px;
+  border-bottom: 1px solid #ccc;
+}
+
+.resume-toolbar button {
+  margin-left: auto;
+  padding: 0.4em 0.9em;
+  border: 1px solid #000;
+  border-radius: 4px;
+  background: #fff;
+  color: #000;
+  font: inherit;
+  cursor: pointer;
+}
+
+.resume-toolbar button:hover {
+  background: #f2f2f2;
+}
+
+.resume-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1.5rem 16px 3rem;
+  line-height: 1.45;
+}
+
+.resume h1 {
+  margin: 0;
+  font-size: 2rem;
+  line-height: 1.15;
+}
+
+.resume-headline {
+  margin: 0.25rem 0 0;
+  font-size: 1.1rem;
+}
+
+.resume h2 {
+  margin: 1.75rem 0 0.6rem;
+  padding-bottom: 0.2rem;
+  border-bottom: 1px solid #000;
+  font-size: 1.1rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.resume h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.resume p {
+  margin: 0.15rem 0 0;
+}
+
+.resume ul {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.resume .resume-entries {
+  display: grid;
+  gap: 0.9rem;
+  padding: 0;
+  list-style: none;
+}
+
+.resume .resume-contact {
+  margin-bottom: 0.6rem;
+}
+
+@media print {
+  /* Fits both A4 and Letter */
+  @page {
+    margin: 15mm 14mm;
+  }
+
+  body {
+    background: #fff;
+    color: #000;
+  }
+
+  .resume-toolbar {
+    display: none;
+  }
+
+  .resume {
+    min-height: 0;
+  }
+
+  .resume-page {
+    max-width: none;
+    padding: 0;
+    font-size: 10.5pt;
+  }
+
+  .resume-entry,
+  .resume-contact li,
+  .resume-skills li {
+    break-inside: avoid;
+  }
+
+  .resume h2,
+  .resume h3 {
+    break-after: avoid;
+  }
+
+  /* Link text is already the full URL, so nothing needs appending; just drop the underline. */
+  .resume a {
+    text-decoration: none;
+  }
+}
+
+/* ---------- Reduced motion: freeze decorative animation ----------
+   Keyed off <html data-motion="reduced">, which App sets from the visitor's Motion setting
+   ("Auto" follows prefers-reduced-motion), so an explicit choice wins over the OS either way. */
+:root[data-motion='reduced'] .loading-screen *,
+:root[data-motion='reduced'] .loading-screen *::before,
+:root[data-motion='reduced'] .loading-screen *::after {
+  animation: none !important;
+}
+
+:root[data-motion='reduced'] :is(.btn, .section-modal-close) {
+  transition: none;
+}
+
+:root[data-motion='reduced'] :is(.dock-prompt, .section-modal[open], .season-menu, .coming-soon-bubble, .error-art-icon, .lightbox, .lightbox-img),
+:root[data-motion='reduced'] .lightbox::backdrop {
+  animation: none;
+}
+
+:root[data-motion='reduced'] :is(.project-shot img, .lightbox-close, .lightbox-nav) {
+  transition: none;
+}
+
+/* (:is() can't hold pseudo-elements, so those are listed separately) */
+:root[data-motion='reduced'] :is(.season-caret, .season-option, .minimap-pin, .travel-fade, .navbar-link, .navbar-toggle-bars),
+:root[data-motion='reduced'] .minimap-pin::after,
+:root[data-motion='reduced'] .navbar-toggle-bars::before,
+:root[data-motion='reduced'] .navbar-toggle-bars::after {
+  transition: none;
+}
