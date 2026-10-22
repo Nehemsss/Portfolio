@@ -30,6 +30,8 @@ export default function WorldPage() {
 
   const isTouch = useCoarsePointer()
   const sailing = useAppStore((s) => s.activeSection === null)
+  // Dismissable, but only for this visit: it comes back whenever the 3D page is entered again.
+  const [hintOpen, setHintOpen] = useState(true)
 
   return (
     <div className={`world-page ${isTouch ? 'is-touch' : ''}`}>
@@ -49,22 +51,34 @@ export default function WorldPage() {
           <DockPrompt />
           <Minimap />
           {isTouch && sailing && <Joystick />}
-          {isTouch ? (
-            <p className="hud-hint">
-              Joystick sail <span className="hud-hint-sep">·</span> Tap Dock{' '}
-              <span className="hud-hint-sep">·</span> Pinch zoom <span className="hud-hint-sep">·</span> Two-finger
-              drag rotate
-            </p>
-          ) : (
-            <p className="hud-hint">
-              <kbd>W</kbd>
-              <kbd>A</kbd>
-              <kbd>S</kbd>
-              <kbd>D</kbd> sail <span className="hud-hint-sep">·</span> <kbd>E</kbd> dock{' '}
-              <span className="hud-hint-sep">·</span> Right-drag or <kbd>[</kbd>
-              <kbd>]</kbd> rotate <span className="hud-hint-sep">·</span> Scroll or <kbd>+</kbd>
-              <kbd>-</kbd> zoom
-            </p>
+          {hintOpen && (
+            <div className="hud-hint">
+              {isTouch ? (
+                <p className="hud-hint-text">
+                  Joystick sail <span className="hud-hint-sep">·</span> Tap Dock{' '}
+                  <span className="hud-hint-sep">·</span> Pinch zoom <span className="hud-hint-sep">·</span> Drag
+                  rotate
+                </p>
+              ) : (
+                <p className="hud-hint-text">
+                  <kbd>W</kbd>
+                  <kbd>A</kbd>
+                  <kbd>S</kbd>
+                  <kbd>D</kbd> sail <span className="hud-hint-sep">·</span> <kbd>E</kbd> dock{' '}
+                  <span className="hud-hint-sep">·</span> Right-drag or <kbd>[</kbd>
+                  <kbd>]</kbd> rotate <span className="hud-hint-sep">·</span> Scroll or <kbd>+</kbd>
+                  <kbd>-</kbd> zoom
+                </p>
+              )}
+              <button
+                type="button"
+                className="hud-hint-close"
+                aria-label="Hide controls hint"
+                onClick={() => setHintOpen(false)}
+              >
+                ✕
+              </button>
+            </div>
           )}
           <SectionModal />
         </>

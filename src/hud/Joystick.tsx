@@ -1,9 +1,10 @@
 import { useEffect, useRef, type PointerEvent } from 'react'
 import { boatInput } from '../world/boat/boatState'
 
-/** How far (px) the knob can travel from the centre; full deflection = full throttle/steer. */
-const RADIUS = 44
-/** Ignore tiny thumb wobble near the centre (fraction of RADIUS). */
+/** How far the knob can travel from the centre, as a fraction of the stick's width (it's smaller on
+ *  phones); full deflection = full throttle/steer. */
+const TRAVEL = 1 / 3
+/** Ignore tiny thumb wobble near the centre (fraction of the travel). */
 const DEAD_ZONE = 0.18
 
 /** Rescales past the dead zone so output still reaches 0..1 smoothly. */
@@ -40,16 +41,17 @@ export default function Joystick() {
   const track = (e: PointerEvent<HTMLDivElement>) => {
     const rect = base.current?.getBoundingClientRect()
     if (!rect) return
+    const radius = rect.width * TRAVEL
     let dx = e.clientX - (rect.left + rect.width / 2)
     let dy = e.clientY - (rect.top + rect.height / 2)
     const length = Math.hypot(dx, dy)
-    if (length > RADIUS) {
-      dx *= RADIUS / length
-      dy *= RADIUS / length
+    if (length > radius) {
+      dx *= radius / length
+      dy *= radius / length
     }
     if (knob.current) knob.current.style.transform = `translate(${dx}px, ${dy}px)`
-    boatInput.throttle = applyDeadZone(-dy / RADIUS)
-    boatInput.steer = applyDeadZone(-dx / RADIUS) // +1 = turn left
+    boatInput.throttle = applyDeadZone(-dy / radius)
+    boatInput.steer = applyDeadZone(-dx / radius) // +1 = turn left
   }
 
   return (

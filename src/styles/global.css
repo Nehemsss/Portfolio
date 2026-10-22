@@ -65,7 +65,7 @@ a {
 
 /* Over the 3D scene the background can be anything (bright sand, night sea), so the HUD's focus
    ring is white with a dark halo: visible on both. */
-.world-page :is(.hud-top, .minimap, .dock-prompt) :focus-visible {
+.world-page :is(.hud-top, .hud-hint, .minimap, .dock-prompt) :focus-visible {
   outline: 3px solid #fff;
   outline-offset: 2px;
   box-shadow: 0 0 0 6px var(--ink);
@@ -687,7 +687,37 @@ a {
   font-weight: 500;
   text-align: center;
   width: max-content;
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  padding-right: 0.45em;
   pointer-events: none;
+}
+
+.hud-hint-text {
+  margin: 0;
+}
+
+.hud-hint-close {
+  display: grid;
+  place-items: center;
+  width: 1.7em;
+  height: 1.7em;
+  flex: none;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.75);
+  color: var(--ink);
+  font-size: 0.85em;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.hud-hint-close:hover {
+  background: #fff;
 }
 
 .hud-hint-sep {
@@ -769,6 +799,23 @@ kbd {
 .dock-prompt .btn kbd {
   margin-right: 0;
   box-shadow: 0 2px 0 var(--sun-dark);
+}
+
+/* Touch: just a small button at the bottom centre, between the joystick and the map button */
+.dock-prompt.is-compact,
+.is-touch .dock-prompt.is-compact {
+  bottom: var(--hud-bottom);
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.dock-prompt.is-compact .btn {
+  min-height: 44px;
+  padding: 0.45em 1em;
+  font-size: 1rem;
+  border-radius: 14px;
 }
 
 @keyframes dock-prompt-in {
@@ -1016,8 +1063,57 @@ kbd {
     transform: none;
   }
 
+  /* Phones: a smaller, lighter HUD so more of the scene shows */
+  .hud-top {
+    gap: 0.4rem;
+  }
+
+  .hud-left,
+  .hud-top .view-switcher {
+    gap: 0.35rem;
+  }
+
   .hud-top .btn {
-    padding: 0.5em 0.6em;
+    padding: 0.4em 0.5em;
+    font-size: 0.8rem;
+    border-radius: 12px;
+    box-shadow:
+      0 3px 0 var(--btn-edge),
+      0 6px 10px rgb(13 40 71 / 0.16);
+  }
+
+  .hud-top .btn-icon {
+    font-size: 1.15em;
+  }
+
+  .hud-top .lock-badge {
+    top: -6px;
+    right: -5px;
+    width: 16px;
+    height: 16px;
+    font-size: 0.5rem;
+  }
+
+  .is-touch .hud-hint {
+    top: calc(var(--hud-top) + 48px);
+    font-size: 0.72rem;
+    padding: 0.35em 0.4em 0.35em 0.9em;
+  }
+
+  .minimap-toggle {
+    font-size: 0.8rem;
+  }
+
+  .joystick {
+    left: var(--hud-left);
+    width: 104px;
+    height: 104px;
+  }
+
+  .joystick-knob {
+    width: 48px;
+    height: 48px;
+    margin: -24px 0 0 -24px;
   }
 
   .minimap-body {
@@ -1158,19 +1254,22 @@ kbd {
   background: #fff;
 }
 
-/* Phones: full-screen sheet */
+/* Phones: a compact card with a little sea showing around it, and everything inside scaled down */
 @media (max-width: 640px) {
   .section-modal {
-    width: 100%;
-    height: 100%;
-    max-height: none;
-    margin: 0;
-    border: 0;
-    border-radius: 0;
+    width: calc(100% - 24px);
+    max-height: calc(100% - 32px);
+    border-width: 3px;
+    border-radius: 20px;
+    box-shadow:
+      0 5px 0 var(--sand-dark),
+      0 16px 40px rgb(13 40 71 / 0.35);
+    font-size: 0.9rem;
   }
 
   .section-modal-inner {
-    max-height: none;
+    max-height: calc(100vh - 32px);
+    max-height: calc(100dvh - 32px);
   }
 
   .section-modal[open] {
@@ -1181,8 +1280,106 @@ kbd {
     from { opacity: 0; transform: translateY(40px); }
   }
 
+  .section-modal-header {
+    gap: 0.6rem;
+    padding: 0.6rem 0.6rem 0.6rem 0.75rem;
+  }
+
+  .section-modal-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    font-size: 1.15rem;
+  }
+
+  .section-modal-title {
+    font-size: 1.1rem;
+  }
+
+  .section-modal-close {
+    width: 34px;
+    height: 34px;
+    border-width: 2px;
+    font-size: 0.9rem;
+  }
+
+  .section-modal-body {
+    padding: 0.85rem;
+  }
+
+  .section-modal-footer {
+    padding: 0.6rem 0.85rem 0.75rem;
+  }
+
+  .section-modal-footer .btn {
+    padding: 0.4em 0.85em;
+    font-size: 0.85rem;
+    border-radius: 12px;
+  }
+
   .section-modal-hint {
     display: none;
+  }
+
+  /* Shared section content, scaled for the small card */
+  .section-modal .sec {
+    gap: 0.6rem;
+  }
+
+  .section-modal .sec-heading {
+    margin-top: 0.5rem;
+    font-size: 1rem;
+  }
+
+  .section-modal .sec-name {
+    font-size: 1.15rem;
+  }
+
+  .section-modal .sec-avatar {
+    width: 64px;
+    height: 64px;
+    border-width: 3px;
+  }
+
+  .section-modal .sec-card {
+    gap: 0.7rem;
+    padding: 0.7rem 0.75rem;
+    border-radius: 14px;
+  }
+
+  .section-modal .sec-card-project {
+    padding: 0;
+  }
+
+  .section-modal .sec-card-project .sec-card-body {
+    padding: 0.7rem 0.75rem 0.8rem;
+  }
+
+  .section-modal .sec-card-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    font-size: 1.15rem;
+  }
+
+  .section-modal .sec-card-title {
+    font-size: 0.98rem;
+  }
+
+  .section-modal .sec-muted {
+    font-size: 0.85rem;
+  }
+
+  .section-modal .chip {
+    font-size: 0.78rem;
+  }
+
+  .section-modal .skill-group {
+    padding: 0.6rem 0.7rem;
+  }
+
+  .section-modal .btn {
+    font-size: 0.85rem;
   }
 }
 
@@ -1706,6 +1903,7 @@ kbd {
   display: inline-flex;
   align-items: center;
   gap: 0.55rem;
+  min-width: 0;
   color: var(--text);
   font-family: var(--font-display);
   font-size: 1.15rem;
@@ -1714,8 +1912,14 @@ kbd {
   white-space: nowrap;
 }
 
+.navbar-brand-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .navbar-brand-mark {
   display: grid;
+  flex: none;
   place-items: center;
   width: 2.1rem;
   height: 2.1rem;
@@ -1784,6 +1988,7 @@ kbd {
 /* Hamburger: three CSS bars that turn into an X while the menu is open */
 .navbar-toggle {
   display: none;
+  flex: none;
   align-items: center;
   gap: 0.6rem;
   margin-left: auto;
@@ -1901,6 +2106,62 @@ kbd {
   }
 }
 
+/* Phones: a slimmer navbar; the Menu button goes icon-only (its text stays the accessible name) */
+@media (max-width: 480px) {
+  .view-2d {
+    --nav-h: 3.5rem;
+  }
+
+  .navbar-inner {
+    gap: 0.6rem;
+    padding: 0.45rem 12px;
+  }
+
+  .navbar-brand {
+    gap: 0.45rem;
+    font-size: 1rem;
+  }
+
+  .navbar-brand-mark {
+    width: 1.8rem;
+    height: 1.8rem;
+  }
+
+  .navbar-toggle {
+    padding: 0.6em 0.65em;
+  }
+
+  .navbar-toggle-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .navbar-toggle-bars {
+    margin: 6px 0;
+  }
+
+  .navbar-menu {
+    right: 12px;
+    min-width: 0;
+    width: min(260px, calc(100vw - 24px));
+    max-width: calc(100vw - 24px);
+  }
+
+  .navbar-link {
+    padding: 0.55em 0.75em;
+  }
+
+  .navbar .btn,
+  .theme-toggle {
+    font-size: 0.82rem;
+  }
+}
+
 /* Light/dark mode switch */
 .theme-toggle {
   display: inline-flex;
@@ -2003,7 +2264,61 @@ kbd {
 
   .hero-inner.has-photo .hero-photo {
     order: 0;
-    width: 132px;
+    width: 112px;
+    border-width: 4px;
+  }
+
+  .hero {
+    padding-top: 2rem;
+    padding-bottom: 2.75rem;
+  }
+
+  .hero-eyebrow {
+    font-size: 1rem;
+  }
+
+  .hero-title {
+    font-size: 2rem;
+  }
+
+  .hero-headline {
+    font-size: 1.05rem;
+  }
+
+  .hero-tagline {
+    margin-top: 0.6rem;
+    font-size: 0.95rem;
+  }
+
+  .hero-actions {
+    gap: 0.6rem;
+    margin-top: 1.25rem;
+  }
+
+  .hero-actions .btn {
+    padding: 0.5em 0.9em;
+    font-size: 0.88rem;
+  }
+
+  .view-2d-sections {
+    gap: 2.25rem;
+    padding-top: 1.5rem;
+  }
+
+  .view-2d-heading {
+    font-size: 1.35rem;
+  }
+
+  .view-2d-heading-icon {
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 12px;
+    font-size: 1.15rem;
+  }
+
+  .view-2d-panel {
+    font-size: 0.93rem;
+    border-radius: 18px;
   }
 }
 

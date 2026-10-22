@@ -10,18 +10,21 @@ const ELEVATION = MathUtils.degToRad(36) // fixed angle above the horizon; rotat
 const START_AZIMUTH = 0 // 0 = camera sits south (+Z) of the boat looking north, matching the start heading
 const START_DISTANCE = 75 // from the look-at point
 const MIN_DISTANCE = 40 // closest zoom
-const MAX_DISTANCE = 140 // furthest zoom
+const MAX_DISTANCE = 140 // furthest zoom (landscape)
+const PORTRAIT_ZOOM_OUT = 1.6 // tall phone screens show less sideways, so allow up to this much further out
 const DOCKED_DISTANCE = 55 // gentle zoom-in while an island's details modal is open
 const SPEED_ZOOM = 10 // extra distance at full speed
 const LOOK_AHEAD = 10 // shift the view toward where the boat is heading, at full speed
 const ROTATE_SPEED = 0.006 // radians per pixel of right-drag
-const TOUCH_ROTATE_SPEED = 0.008 // radians per pixel of two-finger horizontal drag
+const TOUCH_ROTATE_SPEED = 0.008 // radians per pixel of one-finger horizontal drag
 const WHEEL_ZOOM_SPEED = 0.0012 // exponential, so each notch feels the same near and far
 const KEY_ZOOM_STEP = 1.15
 const KEY_ROTATE_STEP = 0.2 // radians per [ / ] press (holding the key repeats)
 // The narrow field of view (diorama / near-isometric feel) is set on <Canvas camera> in World.tsx.
 
-const clampDistance = (d: number) => MathUtils.clamp(d, MIN_DISTANCE, MAX_DISTANCE)
+/** Furthest zoom for the current screen shape: portrait gets more room, up to PORTRAIT_ZOOM_OUT. */
+const maxDistance = (width: number, height: number) =>
+  MAX_DISTANCE * MathUtils.clamp(height / Math.max(width, 1), 1, PORTRAIT_ZOOM_OUT)
 
 /**
  * Fixed-elevation bird's-eye camera.
@@ -29,12 +32,13 @@ const clampDistance = (d: number) => MathUtils.clamp(d, MIN_DISTANCE, MAX_DISTAN
  * - Mouse wheel / +,- keys zoom between MIN and MAX_DISTANCE.
  * - Holding the right mouse button and dragging (or the [ and ] keys) orbits horizontally only
  *   (elevation stays fixed).
- * - Touch: two-finger pinch zooms, two-finger horizontal drag orbits (one finger does nothing;
- *   the canvas has touch-action: none so the page never scrolls or zooms instead).
+ * - Touch: one-finger horizontal drag orbits, two-finger pinch zooms (the canvas has
+ *   touch-action: none so the page never scrolls or zooms instead).
  * Both zoom and rotation ease toward their targets for smooth motion.
  */
 export default function CameraRig() {
   const gl = useThree((s) => s.gl)
+  const size = useThree((s) => s.size)
   const focus = useRef<Vector3 | null>(null)
   const target = useRef(new Vector3())
   const zoom = useRef(START_DISTANCE)
@@ -42,17 +46,25 @@ export default function CameraRig() {
   const azimuth = useRef(START_AZIMUTH)
   const azimuthTarget = useRef(START_AZIMUTH)
   const lastTeleport = useRef(boatTeleport.count)
+  const maxDist = useRef(MAX_DISTANCE)
+
+  // Rotating the phone (or resizing the window) changes how far out the zoom may go.
+  useEffect(() => {
+    maxDist.current = maxDistance(size.width, size.height)
+    zoomTarget.current = Math.min(zoomTarget.current, maxDist.current)
+  }, [size.width, size.height])
 
   useEffect(() => {
     const el = gl.domElement
     let rotating = false
+    const clampDistance = (d: number) => MathUtils.clamp(d, MIN_DISTANCE, maxDist.current)
 
-    // Active touch points; with exactly two down, `pinch` holds the last measured spread and midpoint.
+    // Active touch points; with exactly two down, `pinch` holds the last measured spread.
     const touches = new Map<number, { x: number; y: number }>()
-    let pinch: { dist: number; midX: number } | null = null
+    let pinch: { dist: number } | null = null
     const measurePinch = () => {
       const [a, b] = [...touches.values()]
-      return { dist: Math.hypot(a.x - b.x, a.y - b.y), midX: (a.x + b.x) / 2 }
+      return { dist: Math.hypot(a.x - b.x, a.y - b.y) }
     }
 
     const onPointerDown = (e: PointerEvent) => {
@@ -67,13 +79,18 @@ export default function CameraRig() {
     }
     const onPointerMove = (e: PointerEvent) => {
       if (e.pointerType === 'touch') {
-        if (!touches.has(e.pointerId)) return
+        const prev = touches.get(e.pointerId)
+        if (!prev) return
         touches.set(e.pointerId, { x: e.clientX, y: e.clientY })
+        // One finger: horizontal drag orbits.
+        if (touches.size === 1) {
+          azimuthTarget.current -= (e.clientX - prev.x) * TOUCH_ROTATE_SPEED
+          return
+        }
         if (!pinch || touches.size !== 2) return
         const now = measurePinch()
         // Fingers spreading apart = zoom in (shorter distance), like pinch-zoom on a photo.
         if (now.dist > 0) zoomTarget.current = clampDistance((zoomTarget.current * pinch.dist) / now.dist)
-        azimuthTarget.current -= (now.midX - pinch.midX) * TOUCH_ROTATE_SPEED
         pinch = now
         return
       }

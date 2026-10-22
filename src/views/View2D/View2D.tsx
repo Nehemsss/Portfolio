@@ -118,7 +118,7 @@ export default function View2D() {
             <span className="navbar-brand-mark" aria-hidden="true">
               {personal.name.charAt(0)}
             </span>
-            {personal.name}
+            <span className="navbar-brand-name">{personal.name}</span>
           </a>
 
           <button
@@ -130,7 +130,7 @@ export default function View2D() {
             onClick={() => setMenuOpen((open) => !open)}
           >
             <span className="navbar-toggle-bars" aria-hidden="true" />
-            Menu
+            <span className="navbar-toggle-label">Menu</span>
           </button>
 
           <div id={MENU_ID} className={`navbar-menu ${menuOpen ? 'is-open' : ''}`}>

@@ -80,20 +80,19 @@ export const portfolio: Portfolio = {
   ],
 
   projects: [
-    // TODO: replace all entries. Put screenshots in /public/images/ and list them as "/images/name.png".
     {
       title: '3D Island Portfolio',
       description: 'This site: an interactive boat-driving portfolio built with React Three Fiber.',
       tech: ['React', 'TypeScript', 'Three.js', 'Rapier'],
       screenshots: ['/images/Portfolio (1).png','/images/Portfolio (2).png','/images/Portfolio (3).png','/images/Portfolio (4).png','/images/Portfolio (5).png','/images/Portfolio (6).png'],
-      // repoUrl: 'https://github.com/your-username/portfolio',
+      repoUrl: 'https://github.com/Nehemsss/Portfolio',
     },
     {
       title: 'EASE',
       description: 'A Employee and Absence System Engine.',
       tech: ['PHP', 'MySQL', 'PostgreSQL','React','JavaScript'],
       screenshots: ['/images/Website_EASE_1.png','/images/Website_EASE_2.png','/images/Website_EASE_3.png','/images/Website_EASE_4.png','/images/Website_EASE_5.png','/images/Website_EASE_6.png'],
-      // repoUrl: 'https://github.com/your-username/sample-project',
+      repoUrl: 'https://github.com/Nehemsss/ease-laravel',
     },
     {
       title: 'APGEAsure: Aurora Provincial Government Employee Association',
@@ -101,14 +100,14 @@ export const portfolio: Portfolio = {
       tech: ['PHP', 'Supabase', 'PostgreSQL','Bootstrap','CSS', 'Vite'],
       screenshots: [],
       // liveUrl: 'https://APGEAsure.onrender.com',
-      // repoUrl: 'https://github.com/your-username/sample-project',
+      // repoUrl: '',
     },
     {
       title: 'Clocker',
       description: 'This site is an interactive online clock website.',
       tech: ['JavaScript', 'Java', 'CSS'],
       screenshots: ['/images/Website_Clocker_1.png','/images/Website_Clocker_2.png','/images/Website_Clocker_3.png','/images/Website_Clocker_4.png'],
-      // repoUrl: 'https://github.com/your-username/portfolio',
+      // repoUrl: '',
     },
   ],
 

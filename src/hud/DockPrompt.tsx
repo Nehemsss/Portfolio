@@ -54,23 +54,30 @@ export default function DockPrompt() {
       <p className="visually-hidden" role="status" aria-live="polite">
         {announcement}
       </p>
-      {info && nearbyDock && (
-        <div className="dock-prompt">
-          <span className="dock-prompt-text">
-            <span aria-hidden="true">{info.icon}</span> {info.title}
-          </span>
-          <button type="button" className="btn btn-sun" onClick={() => openSection(nearbyDock)}>
-            {isTouch ? (
-              'Click to dock'
-            ) : (
-              <>
-                <kbd aria-hidden="true">E</kbd>
-                Dock
-              </>
-            )}
-          </button>
-        </div>
-      )}
+      {info &&
+        nearbyDock &&
+        (isTouch ? (
+          // Touch: one small button at the bottom centre, between the joystick and the map.
+          // The island's name is already floating over it in the scene, so only its icon is shown.
+          <div className="dock-prompt is-compact">
+            <button type="button" className="btn btn-sun" onClick={() => openSection(nearbyDock)}>
+              <span className="btn-icon" aria-hidden="true">
+                {info.icon}
+              </span>
+              Dock<span className="visually-hidden"> at {info.title}</span>
+            </button>
+          </div>
+        ) : (
+          <div className="dock-prompt">
+            <span className="dock-prompt-text">
+              <span aria-hidden="true">{info.icon}</span> {info.title}
+            </span>
+            <button type="button" className="btn btn-sun" onClick={() => openSection(nearbyDock)}>
+              <kbd aria-hidden="true">E</kbd>
+              Dock
+            </button>
+          </div>
+        ))}
     </>
   )
 }

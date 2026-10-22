@@ -7,7 +7,7 @@ import ComingSoonButton from './ComingSoonButton'
 
 const VIEWS: { mode: ViewMode; to: string; label: string; icon: string; variant: string }[] = [
   { mode: '3d', to: ROUTES.world, label: 'Back to 3D', icon: '🏝️', variant: 'btn-coral' },
-  { mode: '2d', to: ROUTES.twoD, label: 'Skip to 2D View', icon: '🗺️', variant: 'btn-sea' },
+  { mode: '2d', to: ROUTES.twoD, label: 'Skip to 2D View', icon: '👤', variant: 'btn-sea' },
   { mode: 'text', to: ROUTES.resume, label: 'Text Only', icon: '📄', variant: 'btn-sun' },
 ]
 
