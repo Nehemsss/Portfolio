@@ -1238,6 +1238,24 @@ kbd {
   font-weight: 600;
 }
 
+.cert-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.25rem;
+}
+
+/* "View certificate" is a button (it opens the viewer) styled like the text links around it */
+.cert-view {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  cursor: zoom-in;
+}
+
 .sec-profile {
   display: flex;
   align-items: center;
@@ -1949,6 +1967,44 @@ kbd {
   z-index: 1;
   max-width: 960px;
   margin: 0 auto;
+}
+
+/* With a photo: text on the left, round photo on the right (above the text on phones) */
+.hero-inner.has-photo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: clamp(1.5rem, 5vw, 3.5rem);
+}
+
+.hero-inner.has-photo .hero-photo {
+  order: 2;
+}
+
+.hero-photo {
+  display: block;
+  width: clamp(150px, 22vw, 220px);
+  height: auto;
+  aspect-ratio: 1;
+  border: 6px solid var(--surface);
+  border-radius: 50%;
+  object-fit: cover;
+  /* Inner white ring, then a ring in the season's accent colour */
+  box-shadow:
+    0 0 0 4px var(--accent),
+    0 18px 40px rgb(13 40 71 / 0.22);
+}
+
+@media (max-width: 640px) {
+  .hero-inner.has-photo {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.25rem;
+  }
+
+  .hero-inner.has-photo .hero-photo {
+    order: 0;
+    width: 132px;
+  }
 }
 
 .hero-eyebrow {

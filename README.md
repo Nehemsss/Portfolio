@@ -64,7 +64,7 @@ marked `// TODO: replace`.
 | `personal.email`, `phone` | Contact details (`phone` is optional). |
 | `personal.links` | Contact buttons. `kind` (`email`, `github`, `linkedin`, `website`, `other`) picks the icon. |
 | `personal.avatar` | Optional photo path, e.g. `"/images/avatar.jpg"`. Without it, your initial is shown. |
-| `achievements` | Awards and certifications: `title`, `issuer`, `date` (`"2025-03"` shows as "Mar 2025"), `kind`, optional `description` and `credentialUrl`. |
+| `achievements` | Awards and certifications: `title`, `issuer`, `date` (`"2025-03"` shows as "Mar 2025"), `kind`, optional `description`, `certificateImage` (a picture under `/images/`, opened in the viewer) and `credentialUrl` (a "Verify credential" link). |
 | `skills` | Skill groups: a `category` and its list of `skills`. |
 | `projects` | `title`, `description`, `tech`, optional `liveUrl` and `repoUrl`, and `screenshots`. |
 | `education` | Most recent first: `school`, `credential`, `location`, `startYear`, `endYear` (`"Present"` for ongoing), `honors`. |

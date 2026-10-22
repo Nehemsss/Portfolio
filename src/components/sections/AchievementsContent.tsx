@@ -1,9 +1,12 @@
+import { useState } from 'react'
 import { portfolio } from '../../data/portfolio'
 import type { Achievement } from '../../types/portfolio'
 import { formatDate } from '../../utils/format'
 import ExternalLink from './ExternalLink'
+import Lightbox from './Lightbox'
 
 function AchievementCard({ item }: { item: Achievement }) {
+  const [viewing, setViewing] = useState(false)
   return (
     <li className="sec-card">
       <div className="sec-card-icon" aria-hidden="true">
@@ -15,12 +18,31 @@ function AchievementCard({ item }: { item: Achievement }) {
           {item.issuer} · <time dateTime={item.date}>{formatDate(item.date)}</time>
         </p>
         {item.description && <p className="sec-text">{item.description}</p>}
-        {item.credentialUrl && (
-          <ExternalLink href={item.credentialUrl} className="sec-link">
-            View credential →
-          </ExternalLink>
+        {(item.certificateImage || item.credentialUrl) && (
+          <div className="cert-links">
+            {item.certificateImage && (
+              <button type="button" className="sec-link cert-view" onClick={() => setViewing(true)}>
+                View certificate
+                <span aria-hidden="true"> →</span>
+              </button>
+            )}
+            {item.credentialUrl && (
+              <ExternalLink href={item.credentialUrl} className="sec-link">
+                Verify credential →
+              </ExternalLink>
+            )}
+          </div>
         )}
       </div>
+      {item.certificateImage && (
+        <Lightbox
+          title={item.title}
+          images={[item.certificateImage]}
+          index={viewing ? 0 : null}
+          onNavigate={() => {}}
+          onClose={() => setViewing(false)}
+        />
+      )}
     </li>
   )
 }

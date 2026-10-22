@@ -167,43 +167,49 @@ export default function View2D() {
 
       <main id={MAIN_ID} className="view-2d-main" tabIndex={-1}>
         <section id={HOME_ID} className="hero" aria-labelledby="hero-title" tabIndex={-1}>
-          <span className="hero-art" aria-hidden="true" />
-          <div className="hero-inner">
-            <p className="hero-eyebrow">Hi, I'm</p>
-            <h1 id="hero-title" className="hero-title">
-              {personal.name}
-            </h1>
-            <p className="hero-headline">{personal.headline}</p>
-            <p className="hero-tagline">{personal.tagline}</p>
-            <ul className="hero-actions">
-              {personal.links.map((link, i) => (
-                <li key={link.url}>
-                  <ExternalLink href={link.url} className={`btn ${i === 0 ? 'btn-coral' : ''}`}>
-                    <span className="btn-icon" aria-hidden="true">
-                      {LINK_ICONS[link.kind]}
-                    </span>
-                    {link.label}
-                  </ExternalLink>
+          {/* No photo set: fall back to the seasonal hero art (sun, snowman, pumpkin, heart). */}
+          {!personal.avatar && <span className="hero-art" aria-hidden="true" />}
+          <div className={`hero-inner ${personal.avatar ? 'has-photo' : ''}`}>
+            {personal.avatar && (
+              <img className="hero-photo" src={personal.avatar} alt={`Photo of ${personal.name}`} width={220} height={220} />
+            )}
+            <div className="hero-text">
+              <p className="hero-eyebrow">Hi, I'm</p>
+              <h1 id="hero-title" className="hero-title">
+                {personal.name}
+              </h1>
+              <p className="hero-headline">{personal.headline}</p>
+              <p className="hero-tagline">{personal.tagline}</p>
+              <ul className="hero-actions">
+                {personal.links.map((link, i) => (
+                  <li key={link.url}>
+                    <ExternalLink href={link.url} className={`btn ${i === 0 ? 'btn-coral' : ''}`}>
+                      <span className="btn-icon" aria-hidden="true">
+                        {LINK_ICONS[link.kind]}
+                      </span>
+                      {link.label}
+                    </ExternalLink>
+                  </li>
+                ))}
+                <li>
+                  {FEATURES.textOnlyResume ? (
+                    <Link to={ROUTES.resume} className="btn btn-sun">
+                      <span className="btn-icon" aria-hidden="true">
+                        📄
+                      </span>
+                      Résumé
+                    </Link>
+                  ) : (
+                    <ComingSoonButton className="btn btn-sun" align="start">
+                      <span className="btn-icon" aria-hidden="true">
+                        📄
+                      </span>
+                      Résumé
+                    </ComingSoonButton>
+                  )}
                 </li>
-              ))}
-              <li>
-                {FEATURES.textOnlyResume ? (
-                  <Link to={ROUTES.resume} className="btn btn-sun">
-                    <span className="btn-icon" aria-hidden="true">
-                      📄
-                    </span>
-                    Résumé
-                  </Link>
-                ) : (
-                  <ComingSoonButton className="btn btn-sun" align="start">
-                    <span className="btn-icon" aria-hidden="true">
-                      📄
-                    </span>
-                    Résumé
-                  </ComingSoonButton>
-                )}
-              </li>
-            </ul>
+              </ul>
+            </div>
           </div>
           <span className="hero-wave" aria-hidden="true" />
         </section>

@@ -31,6 +31,8 @@ export const portfolio: Portfolio = {
       { kind: 'github', label: 'GitHub', url: 'https://github.com/Nehemsss' },
       // { kind: 'linkedin', label: 'LinkedIn', url: 'https://www.linkedin.com/in/your-username' }, // TODO: replace
     ],
+    // Square face crop of "ID Picture.jpeg" (the name strip is cut off); shown round in the 2D hero and About.
+    avatar: '/images/avatar.png',
   },
 
   achievements: [
@@ -40,20 +42,21 @@ export const portfolio: Portfolio = {
       date: 'March 26, 2026',
       kind: 'certification',
       description: 'Utilize two-way dialogue with chatbots: idea generation, summarization, rewarding, and grading.',
+      certificateImage: '/images/CISCO Introduction In Modern AI.png',
     },
     {
       title: 'Project Certificate: Data Visualization using Bokeh',
       issuer: 'Coursera Project Network',
       date: 'March 26, 2026',
       kind: 'certification',
-      credentialUrl: 'https://coursera.org/verify/AV2505O3DYU5',
+      certificateImage: '/images/Data Visualization using Bokeh.png',
     },
     {
       title: 'AWS Academy Graduate - Cloud Foundations - Training Badge',
       issuer: 'AWS Academy',
       date: 'October 04, 2026',
       kind: 'certification',
-      credentialUrl: 'https://www.credly.com/go/NZqllBKf',
+      certificateImage: '/images/AWS Academy Graduate Cloud Foundations Training Badg Badge 20261022-21-fcu03a.png',
     },
     {
       title: "College Scholar",

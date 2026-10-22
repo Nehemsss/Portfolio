@@ -3,7 +3,7 @@ import { useFrame } from '@react-three/fiber'
 import { BufferAttribute, BufferGeometry, ShaderMaterial, type Mesh } from 'three'
 import { waveHeight } from '../ocean/waves'
 import { envState } from '../environment/dayNight'
-import { boatState } from './boatState'
+import { boatState, boatTeleport } from './boatState'
 
 const SAMPLES = 48
 const SAMPLE_INTERVAL = 0.06 // seconds between committed trail points
@@ -95,6 +95,7 @@ export default function BoatWake() {
   const mesh = useRef<Mesh>(null)
   // Ring buffer of trail points; index 0 is always the live stern position. Created on first frame.
   const samplesRef = useRef<Sample[] | null>(null)
+  const lastTeleport = useRef(boatTeleport.count)
 
   useEffect(
     () => () => {
@@ -112,29 +113,43 @@ export default function BoatWake() {
     const samples = samplesRef.current
     const now = state.clock.elapsedTime
     const { position: p, yaw, speed } = boatState
-    const fx = Math.sin(yaw)
-    const fz = Math.cos(yaw)
-    const head = {
-      x: p.x - fx * STERN_OFFSET,
-      z: p.z - fz * STERN_OFFSET,
-      yaw,
-      t: now,
-      strength: Math.min(Math.max(speed, 0) / (MAX_SPEED * 0.4), 1),
+
+    // Start the wake fresh (all old points expired, at the boat) when the trail would otherwise
+    // stretch: after a minimap quick travel (old points are back where the boat used to be), or
+    // after a long gap between frames, e.g. returning to a hidden tab, where rendering was paused.
+    const teleported = boatTeleport.count !== lastTeleport.current
+    const resumed = now - samples[0].t > LIFE
+    if (teleported || resumed) {
+      lastTeleport.current = boatTeleport.count
+      for (const s of samples) {
+        s.x = p.x
+        s.z = p.z
+        s.t = now - LIFE
+        s.strength = 0
+      }
     }
 
     // Commit the head as a permanent point every SAMPLE_INTERVAL by shifting the buffer back.
     if (now - samples[1].t >= SAMPLE_INTERVAL) {
       for (let i = SAMPLES - 1; i > 0; i--) Object.assign(samples[i], samples[i - 1])
     }
-    Object.assign(samples[0], head)
+    // The live head: the current stern position (written in place, no per-frame allocation).
+    const head = samples[0]
+    head.x = p.x - Math.sin(yaw) * STERN_OFFSET
+    head.z = p.z - Math.cos(yaw) * STERN_OFFSET
+    head.yaw = yaw
+    head.t = now
+    head.strength = Math.min(Math.max(speed, 0) / (MAX_SPEED * 0.4), 1)
 
     const pos = geo.attributes.position as BufferAttribute
     const age = geo.attributes.aAge as BufferAttribute
     const strength = geo.attributes.aStrength as BufferAttribute
     for (let i = 0; i < SAMPLES; i++) {
       const s = samples[i]
-      const a = Math.min((now - s.t) / LIFE, 1)
-      const half = START_HALF_WIDTH + (now - s.t) * SPREAD
+      // Age is capped at LIFE: an expired point stays at its final width instead of growing forever.
+      const elapsed = Math.min(now - s.t, LIFE)
+      const a = elapsed / LIFE
+      const half = START_HALF_WIDTH + elapsed * SPREAD
       // Boat's left vector is (cos yaw, 0, -sin yaw).
       const lx = Math.cos(s.yaw) * half
       const lz = -Math.sin(s.yaw) * half

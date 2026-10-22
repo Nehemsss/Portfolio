@@ -45,7 +45,10 @@ export interface Achievement {
   date: string
   kind: 'award' | 'certification'
   description?: string
+  /** Optional link to verify the credential online. */
   credentialUrl?: string
+  /** Optional picture of the certificate under /public, e.g. "/images/cert.png"; opens in the viewer. */
+  certificateImage?: string
 }
 
 export interface SkillGroup {
