@@ -15,7 +15,7 @@ const TOUCH_CONTROLS: Control[] = [
   { keys: ['Joystick'], label: 'Sail' },
   { keys: ['Dock'], label: 'Tap to dock at an island' },
   { keys: ['Pinch'], label: 'Zoom' },
-  { keys: ['2-finger drag'], label: 'Rotate view' },
+  { keys: ['Drag'], label: 'Rotate view' },
   { keys: ['Map'], label: 'Quick travel' },
 ]
 

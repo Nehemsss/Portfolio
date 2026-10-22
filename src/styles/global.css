@@ -348,6 +348,83 @@ a {
   border: 1px solid #e3d4ac;
 }
 
+/* Landscape phones: title and progress bar on the left, the controls card on the right,
+   so nothing runs off the bottom of the short screen */
+@media (max-height: 500px) {
+  .ls-content {
+    grid-template-columns: auto auto;
+    grid-template-areas:
+      'title controls'
+      'subtitle controls'
+      'bar controls';
+    align-items: center;
+    column-gap: clamp(1.25rem, 5vw, 3rem);
+    row-gap: 0.5rem;
+    margin-bottom: 14vh;
+  }
+
+  .ls-title {
+    grid-area: title;
+    align-self: end;
+    font-size: clamp(1.8rem, 6vw, 2.6rem);
+    -webkit-text-stroke-width: 5px;
+  }
+
+  .ls-subtitle {
+    grid-area: subtitle;
+    margin: 0;
+    font-size: 0.9rem;
+  }
+
+  .ls-bar {
+    grid-area: bar;
+    align-self: start;
+    width: min(280px, 38vw);
+    height: 18px;
+    padding: 3px;
+  }
+
+  .ls-controls {
+    grid-area: controls;
+    width: auto;
+    margin: 0;
+    padding: 0.6rem 0.9rem 0.7rem;
+    border-radius: 16px;
+  }
+
+  .ls-controls-title {
+    margin-bottom: 0.35rem;
+    font-size: 0.92rem;
+  }
+
+  .ls-controls-list {
+    gap: 0.25rem;
+    font-size: 0.8rem;
+  }
+
+  .ls-controls-keys {
+    min-width: 6.2rem;
+  }
+
+  .ls-sea {
+    height: 24vh;
+    min-height: 70px;
+  }
+
+  .ls-boat {
+    width: 70px;
+    margin-left: -35px;
+  }
+
+  .ls-island {
+    width: 120px;
+  }
+
+  .ls-cloud-1 {
+    top: 6%;
+  }
+}
+
 /* Sea strip at the bottom: two looping wave layers, a boat and a tiny palm island. */
 .ls-sea {
   position: absolute;
@@ -1134,6 +1211,29 @@ kbd {
   }
 }
 
+/* Short screens (phones in landscape): a smaller map so it doesn't eat the scene's height */
+@media (max-height: 500px) {
+  .minimap {
+    gap: 0.4rem;
+  }
+
+  .minimap-toggle {
+    font-size: 0.8rem;
+  }
+
+  .minimap-body {
+    width: 128px;
+    height: 128px;
+    border-width: 3px;
+  }
+
+  .minimap-pin {
+    width: 26px;
+    height: 26px;
+    font-size: 0.8rem;
+  }
+}
+
 /* ---------- Island details modal (native <dialog>) ---------- */
 .section-modal {
   /* Desktop: a card centred on screen; its height follows the content, up to the viewport. */
@@ -1254,10 +1354,11 @@ kbd {
   background: #fff;
 }
 
-/* Phones: a compact card with a little sea showing around it, and everything inside scaled down */
-@media (max-width: 640px) {
+/* Phones (portrait or landscape): a compact card with a little sea showing around it, and
+   everything inside scaled down */
+@media (max-width: 640px), (max-height: 500px) {
   .section-modal {
-    width: calc(100% - 24px);
+    width: min(560px, calc(100% - 24px));
     max-height: calc(100% - 32px);
     border-width: 3px;
     border-radius: 20px;
@@ -1380,6 +1481,26 @@ kbd {
 
   .section-modal .btn {
     font-size: 0.85rem;
+  }
+}
+
+/* Landscape phones: every pixel of height goes to the content; the header's ✕ closes the card */
+@media (max-height: 500px) {
+  .section-modal {
+    max-height: calc(100% - 20px);
+  }
+
+  .section-modal-inner {
+    max-height: calc(100vh - 20px);
+    max-height: calc(100dvh - 20px);
+  }
+
+  .section-modal-header {
+    padding-block: 0.45rem;
+  }
+
+  .section-modal-footer {
+    display: none;
   }
 }
 
