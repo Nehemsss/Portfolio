@@ -12,8 +12,6 @@ dist
 dist-ssr
 *.local
 
-# Local Claude Code settings (personal, not needed to build or deploy)
-.claude/
 
 # Editor directories and files
 .vscode/*
@@ -25,4 +23,3 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-docs/
